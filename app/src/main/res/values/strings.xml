@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Tower Of Hanoi</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_launch">LaunchActivity</string>
+</resources>
