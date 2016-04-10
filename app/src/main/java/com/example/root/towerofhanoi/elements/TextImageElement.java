@@ -9,16 +9,13 @@ import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Plane;
 
-/**
- * Created by root on 30/3/16.
- */
-public class TextElement extends Plane{
+public class TextImageElement extends Plane{
 
     String name;
     int textImageId;
     float size;
 
-    public TextElement(String name, int textImageId, float size) {
+    public TextImageElement(String name, int textImageId, float size) {
         super(size, size, 1, 1);
         this.name = name;
         this.textImageId = textImageId;

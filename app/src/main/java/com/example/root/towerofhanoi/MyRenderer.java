@@ -1,64 +1,62 @@
 package com.example.root.towerofhanoi;
 
 import android.content.Context;
+import android.media.MediaPlayer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import com.example.root.towerofhanoi.elements.ObjectLoader;
 
 import org.rajawali3d.lights.DirectionalLight;
 
 import org.rajawali3d.lights.SpotLight;
+import org.rajawali3d.math.MathUtil;
 import org.rajawali3d.math.vector.Vector2;
 import org.rajawali3d.math.vector.Vector3;
 
 import org.rajawali3d.renderer.RajawaliRenderer;
 
-/**
- * Created by root on 21/3/16.
- */
-
 public class MyRenderer extends RajawaliRenderer{
 
     Context context;
     DirectionalLight directionalLight;
-    SpotLight spotLight;
     MyArcballCamera arcball;
     GameState gameState;
     MyGestureListener myGestureListener;
+    final int noOfDisks;
 
     public MyRenderer(Context context) {
+        this(context, DialogActivity.MIN_NO_OF_DISK);
+    }
+
+    public MyRenderer(Context context, int noOfDisks) {
         super(context);
         this.context = context;
         setFrameRate(60);
         myGestureListener = new MyGestureListener();
+        this.noOfDisks = noOfDisks;
     }
 
     @Override
     protected void initScene() {
 
         ObjectLoader.init(this);
-        gameState = new GameState(5, getCurrentScene());
+        gameState = new GameState(this.noOfDisks, getCurrentScene());
 
-        Vector3 cameraPosition = new Vector3(0, gameState.noOfDisks, gameState.noOfDisks*2);
-
-        Vector3 spotLightPosition = new Vector3(0,gameState.noOfDisks*2,0);
+        Vector3 cameraPosition = new Vector3(0, gameState.noOfDisks, gameState.noOfDisks*2.4);
 
         directionalLight = new DirectionalLight();
         directionalLight.setPower(1f);
-        directionalLight.setPosition(spotLightPosition);
+        directionalLight.setPosition(cameraPosition);
         directionalLight.setLookAt(0, 0, 0);
 
         getCurrentScene().addLight(directionalLight);
 
-        spotLight = new SpotLight();
-        spotLight.setPower(6f);
-        spotLight.setPosition(spotLightPosition);
-        spotLight.setLookAt(0, 0, 0);
-        getCurrentScene().addLight(spotLight);
-
         getCurrentScene().addChild(gameState.base.getSolidObject());
+        getCurrentScene().addChild(gameState.scoreTextPlane);
 
         getCurrentScene().addChild(gameState.textA);
         getCurrentScene().addChild(gameState.textB);
@@ -87,7 +85,7 @@ public class MyRenderer extends RajawaliRenderer{
 
     @Override
     protected void onRender(long ellapsedRealtime, double deltaTime) {
-
+        gameState.scoreTextPlane.render(getTextureManager());
         super.onRender(ellapsedRealtime, deltaTime);
     }
 
@@ -104,6 +102,14 @@ public class MyRenderer extends RajawaliRenderer{
     private void mapToScreen(final float x, final float y, Vector2 out) {
         out.setX((2 * x - mCurrentViewportWidth) / mCurrentViewportWidth);
         out.setY(-(2 * y - mCurrentViewportHeight) / mCurrentViewportHeight);
+    }
+
+    public void handleAddDisk() {
+
+    }
+
+    public void handleRemoveDisk() {
+
     }
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -190,8 +196,26 @@ public class MyRenderer extends RajawaliRenderer{
                     gameState.CURRENT_STATUS = GameState.State.FALLING;
                     gameState.addDisk();
                     gameState.CURRENT_STATUS = GameState.State.FIXED;
+
+                    if(gameState.rodList.get(2).getDiskStack().size() == noOfDisks){
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                MediaPlayer player = MediaPlayer.create(context, R.raw.looney);
+                                player.setLooping(false); // Set looping
+                                player.setVolume(1.0f, 1.0f);
+                                player.start();
+                            }
+                        });
+                    }
                 } else{
                     // cannot add to this peg
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                           Toast.makeText(context, "Oops!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     gameState.CURRENT_STATUS = GameState.State.FALLING;
                     gameState.bounceDisk();
                     gameState.CURRENT_STATUS = GameState.State.UP;

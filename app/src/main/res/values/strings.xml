@@ -2,4 +2,11 @@
     <string name="app_name">Tower Of Hanoi</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_launch">LaunchActivity</string>
+    <string-array name="no_of_disk_list">
+        <item>3 disks</item>
+        <item>4 disks</item>
+        <item>5 disks</item>
+        <item>6 disks</item>
+        <item>7 disks</item>
+    </string-array>
 </resources>

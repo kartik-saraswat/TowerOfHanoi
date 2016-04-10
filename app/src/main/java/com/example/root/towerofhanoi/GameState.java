@@ -6,18 +6,17 @@ import android.util.Log;
 import com.example.root.towerofhanoi.elements.Base;
 import com.example.root.towerofhanoi.elements.Disk;
 import com.example.root.towerofhanoi.elements.Rod;
-import com.example.root.towerofhanoi.elements.TextElement;
+import com.example.root.towerofhanoi.elements.TextImageElement;
+import com.example.root.towerofhanoi.elements.TextPlane;
 
 import org.rajawali3d.animation.ColorAnimation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.RajawaliScene;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
-/**
- * Created by root on 24/3/16.
- */
 public class GameState {
 
     int noOfPegs;
@@ -26,10 +25,14 @@ public class GameState {
     public final static float MIN_RADIUS = 0.2f;
     public final static float MIN_HEIGHT = 0.2f;
 
+    public final static String SCORE_STRING = " ";
+
     Base base;
     ArrayList<Rod> rodList;
     ArrayList<Disk> diskList;
-    TextElement textA, textB, textC;
+    TextPlane textA, textB, textC;
+
+    TextPlane scoreTextPlane;
 
     Vector3 tempFrom = new Vector3();
     Vector3 tempTo =  new Vector3();
@@ -40,12 +43,13 @@ public class GameState {
             Color.GREEN,
             Color.YELLOW,
             Color.CYAN,
-            Color.MAGENTA
+            Color.MAGENTA,
+            Color.rgb(0,128,128)
             };
 
     public enum State{
         FIXED, UP ,RISING, FALLING, FLOATING
-    };
+    }
 
     RajawaliScene scene;
 
@@ -65,9 +69,10 @@ public class GameState {
         this.diskList = new ArrayList<>();
         this.scene = scene;
         createBase();
-        createTextElements();
         createPegs();
         createDisks();
+        createScoreTextPlane();
+        createTextElements();
         reset();
     }
 
@@ -93,6 +98,8 @@ public class GameState {
         destRod = null;
         movingDisk = null;
         isReset = true;
+        noOfMoves = 0;
+        scoreTextPlane.updateText( SCORE_STRING + noOfMoves);
     }
 
     public void createBase(){
@@ -102,20 +109,29 @@ public class GameState {
         base.setPosition(0, -(base.getHeight()/2), 0);
     }
 
+    public void createScoreTextPlane(){
+        scoreTextPlane = new TextPlane("Score","0", base.getLength()*2);
+        scoreTextPlane.setPosition(base.getLeftX() + base.getBreadth() + 1.5f, rodList.get(0).getTopY() + 0.5f , base.getZ());
+    }
+
     public void createTextElements(){
         Vector3 temp = base.getPosition();
         float baseWidth = base.getBreadth()/5;
-        float leftX = (float)base.getLeftX() + baseWidth;
+        float leftX = (float)base.getLeftX() + baseWidth*1.5f;
 
-        textA = new TextElement("a_img",R.drawable.a_img,baseWidth);
-        textB = new TextElement("b_img",R.drawable.b_img,baseWidth);
-        textC = new TextElement("c_img",R.drawable.c_img,baseWidth);
+        textA = new TextPlane("a","A",baseWidth*4, Color.parseColor("#734d26"));
+        textB = new TextPlane("b","B",baseWidth*4, Color.parseColor("#734d26"));
+        textC = new TextPlane("c","C",baseWidth*4, Color.parseColor("#734d26"));
 
         textA.setPosition(leftX, base.getY(), base.getZ()+base.getLength()/2+0.5f);
         leftX = leftX + baseWidth*1.5f;
         textB.setPosition(leftX, base.getY(), base.getZ()+base.getLength()/2+0.5f);
         leftX = leftX + baseWidth*1.5f;
         textC.setPosition(leftX, base.getY(), base.getZ()+base.getLength()/2+0.5f);
+
+        textA.updateText("A");
+        textB.updateText("B");
+        textC.updateText("C");
     }
 
     public void createPegs(){
@@ -139,7 +155,7 @@ public class GameState {
     public void createDisks(){
         float diskHeight = MIN_HEIGHT;
         float diskRadius = MIN_RADIUS;
-
+        diskList.clear();
         for(int i = 0; i < noOfDisks; i++ ){
             int color = colorPool[ i % colorPool.length];
             Disk disk = new Disk("DISK_"+i, diskHeight, diskRadius*(i+1), color);
@@ -203,6 +219,7 @@ public class GameState {
 
             destRod.pushDisk(movingDisk);
             noOfMoves++;
+            scoreTextPlane.updateText( SCORE_STRING + noOfMoves);
         }
     }
 

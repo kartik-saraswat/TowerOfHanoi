@@ -1,6 +1,8 @@
 package com.example.root.towerofhanoi;
 
 import android.app.ActionBar;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -27,12 +29,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        int noOfStrings = getIntent().getIntExtra("NO_OF_STRING", DialogActivity.MIN_NO_OF_DISK);
+
+        setContentView(R.layout.activity_main);
         final RajawaliSurfaceView surface = new RajawaliSurfaceView(this);
         surface.setFrameRate(60.0);
         surface.setRenderMode(IRajawaliSurface.RENDERMODE_WHEN_DIRTY);
-        renderer = new MyRenderer(this);
+        renderer = new MyRenderer(this, noOfStrings);
         surface.setSurfaceRenderer(renderer);
 
         mDetector = new GestureDetectorCompat(this, renderer.myGestureListener);
