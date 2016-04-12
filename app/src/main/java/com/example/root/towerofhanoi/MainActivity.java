@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mDetector.onTouchEvent(event);
+        
         return super.onTouchEvent(event);
     }
 }
